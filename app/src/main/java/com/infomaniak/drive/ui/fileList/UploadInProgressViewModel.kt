@@ -61,12 +61,12 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
 
         return liveData {
             viewModelScope.launch(Dispatchers.IO + indexesToDeleteJob) {
-                UploadFile.getRealmInstance().use { uploadRealm ->
+                UploadFile.getRealmInstance().use { realmUpload ->
 
                     val positions = arrayListOf<Pair<Position, FileId>>()
                     val realmUploadFiles =
-                        if (isFileType) UploadFile.getAllPendingUploads(customRealm = uploadRealm)
-                        else UploadFile.getAllPendingFolders(realm = uploadRealm)
+                        if (isFileType) UploadFile.getAllPendingUploads(customRealm = realmUpload)
+                        else UploadFile.getAllPendingFolders(realm = realmUpload)
 
                     adapterPendingFileIds.forEachIndexed { index, fileId ->
                         ensureActive()
@@ -93,7 +93,6 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
         getFilesJob = Job()
 
         return liveData(Dispatchers.IO + getFilesJob) {
-
             UploadFile.getRealmInstance().use { realmUpload ->
 
                 UploadFile.getAllPendingFolders(realmUpload)?.let { pendingFolders ->
@@ -123,6 +122,8 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
                     val drivesNames = ArrayMap<Int, String>()
 
                     pendingFolders.forEach { uploadFile ->
+                        getFilesJob.ensureActive()
+
                         val driveId = uploadFile.driveId
                         val isSharedWithMe = driveId != AccountUtils.currentDriveId
 
@@ -139,6 +140,7 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
                         files.add(createFolderFile(uploadFile.remoteFolder, userDrive))
                     }
 
+                    getFilesJob.ensureActive()
                     emit(files)
 
                 } ?: emit(null)

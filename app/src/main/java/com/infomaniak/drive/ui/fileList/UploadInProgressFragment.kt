@@ -49,7 +49,8 @@ class UploadInProgressFragment : FileListFragment() {
 
     private val uploadInProgressViewModel: UploadInProgressViewModel by viewModels()
 
-    private lateinit var realmUpload: Realm
+    private val realmUpload: Realm by lazy { UploadFile.getRealmInstance() }
+
     private lateinit var drivePermissions: DrivePermissions
     override var enabledMultiSelectMode: Boolean = false
     override var hideBackButtonWhenRoot: Boolean = false
@@ -57,7 +58,6 @@ class UploadInProgressFragment : FileListFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        realmUpload = UploadFile.getRealmInstance()
         downloadFiles = DownloadFiles()
         setNoFilesLayout = SetNoFilesLayout()
         drivePermissions = DrivePermissions()
