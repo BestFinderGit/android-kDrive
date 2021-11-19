@@ -36,10 +36,11 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 
 class UploadInProgressViewModel(application: Application) : AndroidViewModel(application) {
     private var getFilesJob: Job = Job()
-    private var indexesToDeleteJob = Job()
+    private var indexesToDeleteJob: Job = Job()
 
     private val currentAdapterPendingFiles = MutableLiveData<ArrayList<File>>()
 
@@ -58,25 +59,27 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
         indexesToDeleteJob.cancel()
         indexesToDeleteJob = Job()
 
-        return liveData(Dispatchers.IO + indexesToDeleteJob) {
+        return liveData {
+            viewModelScope.launch(Dispatchers.IO + indexesToDeleteJob) {
+                UploadFile.getRealmInstance().use { uploadRealm ->
 
-            UploadFile.getRealmInstance().use { uploadRealm ->
+                    val positions = arrayListOf<Pair<Position, FileId>>()
+                    val realmUploadFiles =
+                        if (isFileType) UploadFile.getAllPendingUploads(customRealm = uploadRealm)
+                        else UploadFile.getAllPendingFolders(realm = uploadRealm)
 
-                val positions = arrayListOf<Pair<Position, FileId>>()
-                val realmUploadFiles =
-                    if (isFileType) UploadFile.getAllPendingUploads(customRealm = uploadRealm)
-                    else UploadFile.getAllPendingFolders(realm = uploadRealm)
+                    adapterPendingFileIds.forEachIndexed { index, fileId ->
+                        ensureActive()
 
-                adapterPendingFileIds.forEachIndexed { index, fileId ->
-                    indexesToDeleteJob.ensureActive()
-                    val uploadExists = realmUploadFiles?.any { uploadFile ->
-                        isFileType && fileId == uploadFile.uri.hashCode() || !isFileType && fileId == uploadFile.remoteFolder
+                        val uploadExists = realmUploadFiles?.any { uploadFile ->
+                            isFileType && fileId == uploadFile.uri.hashCode() || !isFileType && fileId == uploadFile.remoteFolder
+                        }
+                        if (uploadExists == false) positions.add(index to fileId)
                     }
-                    if (uploadExists == false) positions.add(index to fileId)
-                }
 
-                indexesToDeleteJob.ensureActive()
-                emit(positions)
+                    ensureActive()
+                    emit(positions)
+                }
             }
         }
     }
@@ -248,7 +251,6 @@ class UploadInProgressViewModel(application: Application) : AndroidViewModel(app
 
     override fun onCleared() {
         getFilesJob.cancel()
-        indexesToDeleteJob.cancel()
         super.onCleared()
     }
 
