@@ -323,9 +323,12 @@ class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
     @Deprecated(message = "Only for API 29 and below, otherwise use MediaStore.createDeleteRequest()")
     fun deleteSynchronizedFilesOnDevice(filesToDelete: ArrayList<UploadFile>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val fileDeleted = arrayListOf<UploadFile>()
+
+            val fileDeletedUris = arrayListOf<String>()
+
             filesToDelete.forEach { uploadFile ->
                 val uri = uploadFile.getUriObject()
+
                 if (!uri.scheme.equals(ContentResolver.SCHEME_FILE)) {
                     try {
                         SyncUtils.checkDocumentProviderPermissions(getContext(), uri)
@@ -340,7 +343,7 @@ class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
                                     pathname = cursor.getString(columnIndex)
                                     java.io.File(pathname).delete()
                                     getContext().contentResolver.delete(uri, null, null)
-                                    fileDeleted.add(uploadFile)
+                                    fileDeletedUris.add(uploadFile.uri)
                                 } catch (nullPointerException: NullPointerException) {
                                     Sentry.withScope { scope ->
                                         scope.setExtra("columnIndex", columnIndex.toString())
@@ -353,11 +356,11 @@ class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
                         }
                     } catch (exception: SecurityException) {
                         exception.printStackTrace()
-                        fileDeleted.add(uploadFile)
+                        fileDeletedUris.add(uploadFile.uri)
                     }
                 }
             }
-            UploadFile.deleteAll(fileDeleted)
+            UploadFile.deleteAll(fileDeletedUris)
         }
     }
 

@@ -233,11 +233,11 @@ open class UploadFile(
             }
         }
 
-        fun deleteAll(uploadFiles: ArrayList<UploadFile>) {
+        fun deleteAll(uploadFilesUris: List<String>) {
             getRealmInstance().use {
                 it.executeTransaction { realm ->
-                    uploadFiles.forEach { uploadFile ->
-                        syncFileByUriQuery(realm, uploadFile.uri).findFirst()?.let { uploadFileRealm ->
+                    uploadFilesUris.forEach { uri ->
+                        syncFileByUriQuery(realm, uri).findFirst()?.let { uploadFileRealm ->
                             // Don't delete definitively if it's a sync
                             if (uploadFileRealm.type == Type.SYNC.name) {
                                 uploadFileRealm.deletedAt = Date()
@@ -245,7 +245,7 @@ open class UploadFile(
                                 // Delete definitively
                                 val uri = uploadFileRealm.getUriObject()
                                 if (uri.scheme.equals(ContentResolver.SCHEME_FILE)) {
-                                    if (!uploadFile.isSyncOffline()) uri.toFile().apply { if (exists()) delete() }
+                                    if (!uploadFileRealm.isSyncOffline()) uri.toFile().apply { if (exists()) delete() }
                                 }
                                 uploadFileRealm.deleteFromRealm()
                             }

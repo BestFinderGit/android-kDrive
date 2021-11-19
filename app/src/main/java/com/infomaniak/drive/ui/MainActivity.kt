@@ -79,7 +79,7 @@ class MainActivity : BaseActivity() {
 
     private var lastCloseApp = Date()
     private var updateAvailableShow = false
-    private var uploadedFilesToDelete = arrayListOf<UploadFile>()
+    private var uploadedFilesUrisToDelete = listOf<String>()
 
     private lateinit var drivePermissions: DrivePermissions
     private lateinit var filesDeletionResult: ActivityResultLauncher<IntentSenderRequest>
@@ -115,7 +115,7 @@ class MainActivity : BaseActivity() {
         filesDeletionResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    UploadFile.deleteAll(uploadedFilesToDelete)
+                    UploadFile.deleteAll(uploadedFilesUrisToDelete)
                 }
             }
         }
@@ -244,7 +244,7 @@ class MainActivity : BaseActivity() {
                                     }
                                     .map { it.getUriObject() }
                             )
-                            uploadedFilesToDelete = filesUploadedRecently
+                            uploadedFilesUrisToDelete = filesUploadedRecently.map { it.uri }
                             filesDeletionResult.launch(IntentSenderRequest.Builder(filesDeletionRequest.intentSender).build())
                         } else {
                             mainViewModel.deleteSynchronizedFilesOnDevice(filesUploadedRecently)

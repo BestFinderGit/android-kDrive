@@ -49,7 +49,7 @@ open class FileAdapter(
 
     var onFileClicked: ((file: File) -> Unit)? = null
     var onMenuClicked: ((selectedFile: File) -> Unit)? = null
-    var onStopUploadButtonClicked: ((index: Int, fileName: String) -> Unit)? = null
+    var onStopUploadButtonClicked: ((index: Int, file: File) -> Unit)? = null
     var openMultiSelectMode: (() -> Unit)? = null
     var updateMultiSelectMode: (() -> Unit)? = null
 
@@ -250,7 +250,7 @@ open class FileAdapter(
 
                 when {
                     uploadInProgress && !file.isPendingUploadFolder() -> {
-                        stopUploadButton?.setOnClickListener { onStopUploadButtonClicked?.invoke(position, file.name) }
+                        stopUploadButton?.setOnClickListener { onStopUploadButtonClicked?.invoke(position, file) }
                         stopUploadButton?.isVisible = true
                     }
                     multiSelectMode -> {
