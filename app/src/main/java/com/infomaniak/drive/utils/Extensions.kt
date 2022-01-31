@@ -86,7 +86,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.drive.R
 import com.infomaniak.drive.data.cache.DriveInfosController
 import com.infomaniak.drive.data.models.*
-import com.infomaniak.drive.data.models.File.VisibilityType
 import com.infomaniak.drive.data.models.drive.Category
 import com.infomaniak.drive.data.models.drive.Drive
 import com.infomaniak.drive.ui.OnlyOfficeActivity
@@ -286,12 +285,12 @@ fun View.setFileItem(file: File, isGrid: Boolean = false) {
 
     when {
         file.isFolder() -> {
-            val (icon, tint) = file.getFolderIcon()
-            if (tint == null) {
-                filePreview.loadGlide(icon)
-            } else {
-                filePreview.loadGlide(context.getTintedDrawable(icon, tint))
-            }
+            // val (icon, tint) = file.getFolderIcon()
+            // if (tint == null) {
+            //     filePreview.loadGlide(icon)
+            // } else {
+            //     filePreview.loadGlide(context.getTintedDrawable(icon, tint))
+            // }
         }
         file.isDrive() -> filePreview.loadGlide(context.getTintedDrawable(R.drawable.ic_drive, file.driveColor))
         else -> {
@@ -830,25 +829,4 @@ fun MaterialCardView.setCornersRadius(topCornerRadius: Float, bottomCornerRadius
         .setBottomLeftCorner(CornerFamily.ROUNDED, bottomCornerRadius)
         .setBottomRightCorner(CornerFamily.ROUNDED, bottomCornerRadius)
         .build()
-}
-
-/**
- * This method is here, and not directly a class method in the File class, because of a supposed Realm bug.
- * When we try to put it in the File class, the app doesn't build anymore, because of a "broken method".
- * This is not the only method in this case, search this comment in the project, and you'll see.
- * Realm's Github issue: https://github.com/realm/realm-java/issues/7637
- */
-fun File.getFolderIcon(): Pair<Int, String?> {
-    return when (getVisibilityType()) {
-        VisibilityType.IS_TEAM_SPACE -> R.drawable.ic_folder_common_documents to null
-        VisibilityType.IS_SHARED_SPACE -> R.drawable.ic_folder_shared to null
-        VisibilityType.IS_COLLABORATIVE_FOLDER -> R.drawable.ic_folder_dropbox_tintable to color
-        else -> {
-            if (isDisabled()) {
-                R.drawable.ic_folder_disable to null
-            } else {
-                R.drawable.ic_folder_filled_tintable to color
-            }
-        }
-    }
 }

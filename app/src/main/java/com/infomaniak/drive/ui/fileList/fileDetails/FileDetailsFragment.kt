@@ -17,8 +17,6 @@
  */
 package com.infomaniak.drive.ui.fileList.fileDetails
 
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,7 +32,6 @@ import com.infomaniak.drive.data.cache.FileController
 import com.infomaniak.drive.data.models.File
 import com.infomaniak.drive.utils.TabViewPagerUtils
 import com.infomaniak.drive.utils.TabViewPagerUtils.setup
-import com.infomaniak.drive.utils.getFolderIcon
 import com.infomaniak.drive.utils.loadGlideUrl
 import com.infomaniak.drive.views.CollapsingSubTitleToolbarBehavior
 import com.infomaniak.lib.core.utils.format
@@ -98,9 +95,9 @@ class FileDetailsFragment : FileDetailsSubFragment() {
     private fun setNoPreviewIcon(file: File) {
         noPreviewLayout.icon.apply {
             if (file.isFolder()) {
-                val (icon, tint) = file.getFolderIcon()
-                if (tint != null) imageTintList = ColorStateList.valueOf(Color.parseColor(tint))
-                setImageResource(icon)
+                // val (icon, tint) = file.getFolderIcon()
+                // if (tint != null) imageTintList = ColorStateList.valueOf(Color.parseColor(tint))
+                // setImageResource(icon)
             } else {
                 setImageResource(file.getFileType().icon)
             }
