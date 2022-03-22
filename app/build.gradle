@@ -5,6 +5,10 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'realm-android'
 apply plugin: 'de.mannodermaus.android-junit5'
+// how to apply the sentry android gradle plugin plugin
+apply plugin: 'io.sentry.android.gradle'
+// how to apply the native bundle plugin
+apply plugin: 'com.ydq.android.gradle.native-aar.export'
 
 android {
 
