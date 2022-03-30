@@ -44,11 +44,11 @@ class RecentChangesFragment : FileSubTypeListFragment() {
             setPagination({
                 if (!fileAdapter.isComplete && !isDownloadingChanges) {
                     recentChangesViewModel.currentPage++
-                    downloadFiles(false, false)
+                    downloadFiles(false, true)
                 }
             })
         }
-
+        downloadFiles(true, false)
         sortButton.isGone = true
         collapsingToolbarLayout.title = getString(R.string.lastEditsTitle)
     }
@@ -76,7 +76,7 @@ class RecentChangesFragment : FileSubTypeListFragment() {
                     folderId = FileController.RECENT_CHANGES_FILE_ID,
                     ignoreOffline = true,
                     isComplete = result?.isComplete ?: true,
-                    realm = mainViewModel.realm,
+                    realm = if (ignoreCache) null else mainViewModel.realm,
                     isNewSort = isNewSort,
                 )
                 isDownloadingChanges = false
