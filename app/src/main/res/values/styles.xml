@@ -382,4 +382,13 @@
         <item name="android:focusable">true</item>
     </style>
 
+    <style name="scrollbarShapeStyle">
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
+        <item name="android:scrollbarStyle">outsideOverlay</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadeScrollbars">true</item>
+        <item name="android:scrollbarThumbVertical">@drawable/thumb</item>
+        <item name="android:scrollbarTrackVertical">@drawable/track</item>
+        <item name="android:scrollbarSize">8dp</item>
+    </style>
 </resources>
